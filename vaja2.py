@@ -1,5 +1,5 @@
 import serial
-import time
+import datetime
 
 def read(port,rate):
     ser = serial.Serial(port, rate, timeout=1)
@@ -12,7 +12,9 @@ def read(port,rate):
     while("PV2_EPD_TEMP_SENSOR" not in read_line):
         read_line = ser.readline()
         if "PV2_EPD_TEMP_SENSOR" in read_line:
-            print(read_line.split(":")[1])
+            temp = read_line.split(":")[1]
+            temp_date=temp+datetime.date
+            print(temp_date)
     ser.close()
 
 
