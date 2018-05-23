@@ -3,7 +3,6 @@ import datetime
 import time
 
 def read(port,rate):
-    print datetime.datetime.today().isoformat()
     ser = serial.Serial(port, rate, timeout=1)
     ser.close()
     ser.open()
