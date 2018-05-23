@@ -1,7 +1,9 @@
 import serial
 import datetime
+import time
 
 def read(port,rate):
+    print datetime.datetime.today().isoformat()
     ser = serial.Serial(port, rate, timeout=1)
     ser.close()
     ser.open()
@@ -13,16 +15,26 @@ def read(port,rate):
         read_line = ser.readline()
         if "PV2_EPD_TEMP_SENSOR" in read_line:
             temp = read_line.split(":")[1]
-            temp_date=temp+datetime.date
-            print(temp_date)
+            print("Temperature at {1} was {0} degrees celsius".format(temp.strip(), datetime.datetime.today().isoformat()))
+            return(temp.strip(),datetime.datetime.today().isoformat())
     ser.close()
+
 
 
 
 def main():
     #port = input("Select port")
+    zbirka = []
+    a = 0
 
-    read("com3","115200")
+    while True:
+        temp, date = read("/dev/ttyUSB0","115200")
+        time.sleep(5)
+        zbirka.append(temp +","+ date)
+        a+=1
+        if a > 10:
+            break
+    print zbirka
 
 if __name__ == '__main__':
     main()
