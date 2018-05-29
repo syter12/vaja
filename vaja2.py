@@ -11,7 +11,7 @@ class Beri():
         while("PV2_EPD_TEMP_SENSOR" not in read_line):  #read serial port until wanted line
             read_line = ser.readline()
 
-<<<<<<< HEAD
+
         temp = read_line.split(":")[1]
         print("Temperature at {1} was {0} degrees celsius".format(temp.strip(), datetime.datetime.today().isoformat()))
         ser.close()
@@ -33,7 +33,7 @@ def main():
     Beri.write(port,rate)
     while True:
         temp, date = Beri.read(port,rate)
-=======
+
     read_line = ser.readline()
     print(read_line.decode())
     while("PV2_EPD_TEMP_SENSOR" not in read_line):
@@ -54,17 +54,14 @@ def main():
 
     while True:
         temp, date = read("/dev/ttyUSB0","115200")
->>>>>>> 62fac8f91f635aafb8677020c336c91a8a987aa4
+
         time.sleep(5)
         zbirka.append(temp +","+ date)
         a+=1
         if a > 10:
             break
-<<<<<<< HEAD
     print(zbirka)
-=======
-    print zbirka
->>>>>>> 62fac8f91f635aafb8677020c336c91a8a987aa4
+
 
 if __name__ == '__main__':
     main()
