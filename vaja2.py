@@ -35,6 +35,7 @@ def main():
     data = Beri(port, rate)
     command.write()
     while True:
+        #temp, date = data.read(line)
         temp, date = data.read("PV2_EPD_TEMP_SENSOR")
 
         time.sleep(5)
@@ -46,4 +47,6 @@ def main():
 
 
 if __name__ == '__main__':
+    #main(input("Please type the command line you want: "))
     main()
+
