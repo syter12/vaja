@@ -1,6 +1,7 @@
 import serial
 import datetime
 import time
+import matplotlib.pyplot as plt
 
 class Beri():
     def __init__(self, port, rate):
@@ -44,6 +45,11 @@ def main():
         if a > 10:
             break
     print(zbirka)
+    plt.plot(date, temp, color='g')
+    plt.xlabel("cas")
+    plt.ylabel("temperatura")
+    plt.title("spremembra temperature po casu")
+    plt.show()
 
 
 if __name__ == '__main__':
