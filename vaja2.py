@@ -3,37 +3,43 @@ import datetime
 import time
 
 class Beri():
-    def read(self, port, rate):
-        ser = serial.Serial(port, rate, timeout=1)  #initiate serial port
+    def __init__(self, port, rate):
+        self.port = port
+        self.rate = rate
+
+    def read(self, fraza):
+        ser = serial.Serial(self.port, self.rate, timeout=1)  #initiate serial port
         ser.open()
         read_line = ser.readline()    #read line from serial
         print(read_line.decode())
-        while("PV2_EPD_TEMP_SENSOR" not in read_line):  #read serial port until wanted line
+        while(fraza not in read_line):  #read serial port until wanted line
             read_line = ser.readline()
-        temp = read_line.split(":")[1]
-        print("Temperature at {1} was {0} degrees celsius".format(temp.strip(), datetime.datetime.today().isoformat()))
+        data = read_line.split(":")[1]
+        print("Temperature at {1} was {0} degrees celsius".format(data.strip(), datetime.datetime.today().isoformat()))
         ser.close()
-        return(temp.strip(),datetime.datetime.today().isoformat())
+        return(data.strip(),datetime.datetime.today().isoformat())
 
-    def write(self, port, rate):
-        ser = serial.Serial(port, rate, timeout=1)
-        ser.close()
+    def write(self):
+        ser = serial.Serial(self.port, self.rate, timeout=1)
+        ser.close()     #close serial port first
         ser.open()
         ser.write("status_get\r\n")    #get status packet
 
 
 def main():
     port = "/dev/ttyUSB0"
-    rate="115200"
+    rate = "115200"
     zbirka = []
     a = 0
-    Beri.write(port,rate)
+    command = Beri(port, rate)
+    data = Beri(port, rate)
+    command.write()
     while True:
-        temp, date = Beri.read(port,rate)
+        temp, date = data.read("PV2_EPD_TEMP_SENSOR")
 
         time.sleep(5)
         zbirka.append(temp + "," + date)
-        a+=1
+        a += 1
         if a > 10:
             break
     print(zbirka)

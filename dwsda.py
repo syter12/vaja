@@ -1,3 +1,7 @@
-a = [1,"dddd",3]
-for i in a:
-    print (i)
+import random
+
+def generate_random_number():
+    return str(random.randint(0,5))
+
+print(generate_random_number())
+print(generate_random_number()+"-"+generate_random_number())
