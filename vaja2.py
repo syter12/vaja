@@ -1,55 +1,39 @@
 import serial
 import datetime
 import time
-import matplotlib.pyplot as plt
 
-class Beri():
+PORT = "/dev/ttyUSB0"
+RATE = "115200"
+class Serial:
     def __init__(self, port, rate):
         self.port = port
         self.rate = rate
+        self.connection = serial.Serial(self.port, self.rate, timeout=1)
+        self.close = self.connection.close()
+        self.open = self.connection.open()
+
 
     def read(self, fraza):
-        ser = serial.Serial(self.port, self.rate, timeout=1)  #initiate serial port
-        ser.open()
-        read_line = ser.readline()    #read line from serial
-        print(read_line.decode())
-        while(fraza not in read_line):  #read serial port until wanted line
-            read_line = ser.readline()
-        data = read_line.split(":")[1]
-        print("Temperature at {1} was {0} degrees celsius".format(data.strip(), datetime.datetime.today().isoformat()))
-        ser.close()
-        return(data.strip(),datetime.datetime.today().isoformat())
+        read_line = self.connection.readline()    #read line from serial
+        while fraza not in read_line:  #read serial port until wanted line
+            read_line = self.connection.readline()
+        return read_line
 
-    def write(self):
-        ser = serial.Serial(self.port, self.rate, timeout=1)
-        ser.close()     #close serial port first
-        ser.open()
-        ser.write("status_get\r\n")    #get status packet
+    def status_get(self):
+        self.connection.write("status_get\r\n")    #get status packet
+
+    def temp_get(self):
+        self.status_get()
+        temp = self.read("PV2_EPD_TEMP_SENSOR")
+        return temp.split(":")[1].strip()
 
 
 def main():
-    port = "/dev/ttyUSB0"
-    rate = "115200"
-    zbirka = []
-    a = 0
-    command = Beri(port, rate)
-    data = Beri(port, rate)
-    command.write()
-    while True:
-        #temp, date = data.read(line)
-        temp, date = data.read("PV2_EPD_TEMP_SENSOR")
+    device_info = []
+    command = Serial(PORT, RATE)
+    device_info.append(command.temp_get())
 
-        time.sleep(5)
-        zbirka.append(temp + "," + date)
-        a += 1
-        if a > 10:
-            break
-    print(zbirka)
-    plt.plot(date, temp, color='g')
-    plt.xlabel("cas")
-    plt.ylabel("temperatura")
-    plt.title("spremembra temperature po casu")
-    plt.show()
+
 
 
 if __name__ == '__main__':
