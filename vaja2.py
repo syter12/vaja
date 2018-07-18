@@ -16,11 +16,11 @@ class Serial:
 
     #send command for status packet then read lines from serial port until it hits the phrase you specifiy
     def read(self, fraza):
-        self.connection.write("status_get\r\n")
+        self.connection.write(b"status_get\r\n")
         read_line = self.connection.readline()
-        while fraza not in read_line:
+        while fraza.encode() not in read_line:
             read_line = self.connection.readline()
-        return read_line.split(":")[1].strip()
+        return read_line.decode().split(":")[1].strip()
 
 
 
@@ -28,11 +28,11 @@ class Serial:
     def get_uuid(self):
         real_uuid = ""
         counter = 0
-        self.connection.write("uuid_get\r\n")
+        self.connection.write(b"uuid_get\r\n")
         read_line = self.connection.readline()
-        while "UUID" not in read_line:
+        while b"UUID" not in read_line:
             read_line = self.connection.readline()
-        for a in read_line.split(":")[1].split():
+        for a in read_line.decode().split(":")[1].split():
             real_uuid = real_uuid + a[2:]
             counter += 1
             if counter in {4, 6, 8, 10}:
@@ -44,15 +44,15 @@ class Serial:
 
     def get_firmware(self):
         major = self.read("PV2_FIRMWARE_VERSION_MAJOR")
-        minor = self.connection.readline().split(":")[1].strip()
-        revision = self.connection.readline().split(":")[1].strip()
+        minor = self.connection.readline().decode().split(":")[1].strip()
+        revision = self.connection.readline().decode().split(":")[1].strip()
 
         return major + "." + minor + "." + revision
 
     def get_bootloader(self):
         major = self.read("PV2_BOOTLOADER_VERSION_MAJOR")
-        minor = self.connection.readline().split(":")[1].strip()
-        revision = self.connection.readline().split(":")[1].strip()
+        minor = self.connection.readline().decode().split(":")[1].strip()
+        revision = self.connection.readline().decode().split(":")[1].strip()
 
         return major + "." + minor + "." + revision
 
@@ -70,17 +70,17 @@ class Rma_api:
         return token["access_token"]
 
     def send_rma(self,data):
-        requests.post("https://dt.vnct.xyz/api/v1/rma/rma_detail", json=data, headers={"Authorization": "Bearer " + str(self.get_access_token)})
-
+        r = requests.post("https://dt.vnct.xyz/api/v1/rma/rma_detail", json=data, headers={"Authorization": "Bearer " + str(self.get_access_token)})
+        print(r.status_code, r.reason)
 
 def main():
     rma_info = {}
     user_info = {}
     device_info = []
     command = Serial(PORT, RATE)
-    device_info.extend((command.get_wifi_type(), command.get_firmware(), command.get_bootloader(), command.get_gtin()))
     rma_info["device_id"] = command.get_uuid()
-    rma_info["date_recieved"] = datetime.datetime.today()
+    device_info.extend((command.get_wifi_type(), command.get_firmware(), command.get_bootloader(), command.get_gtin()))
+    rma_info["date_recieved"] = datetime.datetime.now().isoformat()
     print("Rma info. Please press enter after each prompt.\n")
     print("Reasons for return:\n15: Integration\n14: Damage-wifi\n13: Damage-screen\n12: Upgrade\n9: CC signal\n8: Battery\n7: Satisfied\n5: Costs\n4: RS module\n3: CC module")
     rma_info["return_reason"] = input("Select return reason: ")
