@@ -29,9 +29,10 @@ class Serial:
         real_uuid = ""
         counter = 0
         self.connection.write("uuid_get\r\n")
-        uuid = self.connection.readline()
-        for a in uuid.split():
-            print (a)
+        read_line = self.connection.readline()
+        while "UUID" not in read_line:
+            read_line = self.connection.readline()
+        for a in read_line.split(":")[1].split():
             real_uuid = real_uuid + a[2:]
             counter += 1
             if counter in {4, 6, 8, 10}:
@@ -43,8 +44,6 @@ class Serial:
 
     def get_firmware(self):
         major = self.read("PV2_FIRMWARE_VERSION_MAJOR")
-        #minor = self.read("PV2_FIRMWARE_VERSION_MINOR")
-        #revision = self.read("PV2_FIRMWARE_VERSION_REVISION")
         minor = self.connection.readline().split(":")[1].strip()
         revision = self.connection.readline().split(":")[1].strip()
 
@@ -52,8 +51,6 @@ class Serial:
 
     def get_bootloader(self):
         major = self.read("PV2_BOOTLOADER_VERSION_MAJOR")
-        #minor = self.read("PV2_BOOTLOADER_VERSION_MINOR")
-        #revision = self.read("PV2_BOOTLOADER_VERSION_REVISION")
         minor = self.connection.readline().split(":")[1].strip()
         revision = self.connection.readline().split(":")[1].strip()
 
