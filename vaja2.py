@@ -70,7 +70,7 @@ class Rma_api:
         return token["access_token"]
 
     def send_rma(self,data):
-        r = requests.post("https://dt.vnct.xyz/api/v1/rma/rma_detail", json=data, headers={"Authorization": "Bearer " + str(self.get_access_token)})
+        r = requests.post("https://dt.vnct.xyz/api/v1/rma/rma_detail/{}".format(data["device_id"]), json=data, headers={"Authorization": "Bearer " + str(self.get_access_token)})
         print(r.status_code, r.reason)
 
 def main():
@@ -79,6 +79,7 @@ def main():
     device_info = []
     command = Serial(PORT, RATE)
     rma_info["device_id"] = command.get_uuid()
+    print(rma_info["device_id"])
     device_info.extend((command.get_wifi_type(), command.get_firmware(), command.get_bootloader(), command.get_gtin()))
     rma_info["date_recieved"] = datetime.datetime.now().isoformat()
     print("Rma info. Please press enter after each prompt.\n")
@@ -89,6 +90,7 @@ def main():
     rma_info["id"] = input("Please enter the RMA number: ")
     user_info["customer_name"] = input("Please enter the customers name: ")
     rma_info["customer"] = input("Please enter the customers email: ")
+    rma_info["country"] = input("Please enter the customers Country: ")
     user_info["company_name"] = input("Please enter the customers company name: ")
 
     send_data = Rma_api()
